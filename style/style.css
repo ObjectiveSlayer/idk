@@ -1,6 +1,9 @@
 *{
   user-select: none !important;
 }
+img {
+  pointer-events: none !important;
+}
 
 html {
   box-sizing: border-box;
@@ -69,7 +72,10 @@ body {
   padding: 10px;
   position: relative;
 }
-
+.khalfan-dp {
+  width: 250px;
+  height: auto;
+}
 .text-box p {
   margin: 0;
   text-align: left;
@@ -137,6 +143,8 @@ body {
 .baloons img {
   display: inline-block;
   position: absolute;
+  opacity: 0;
+  visibility: hidden;
 }
 
 .baloons img:nth-child(even) {
@@ -239,25 +247,29 @@ body {
 /* Media Queries */
 @media screen and (max-height: 1000px) {
   .six .hat {
-    left: 40%;
+    left: 44%;
+    top: -90px;
   }
 }
 
 @media screen and (max-height: 800px) {
   .six .hat {
-    left: 37%;
+    left: 41%;
+    top: -90px;
   }
 }
 
 @media screen and (max-height: 700px) {
   .six .hat {
-    left: 32%;
+    left: 36%;
+    top: -90px;
   }
 }
 
 @media screen and (max-height: 850px) and (max-width: 450px) {
   .six .hat {
-    left: 32%;
+    left: 36%;
+    top: -20px;
   }
 }
 
@@ -285,7 +297,7 @@ body {
 
   .six .hat {
     width: 50px;
-    top: -20px;
+    top: -60px;
   }
 
   .wish-hbd {
