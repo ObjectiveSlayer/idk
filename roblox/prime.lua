@@ -831,6 +831,18 @@ local function toggleNoclip(enabled)
         end
         local character = player.Character
         if character then
+            local humanoid = character:FindFirstChild("Humanoid")
+            local rootPart = character:FindFirstChild("HumanoidRootPart")
+            
+            if humanoid then
+                humanoid:ChangeState(Enum.HumanoidStateType.Landing)
+            end
+            
+            if rootPart then
+                rootPart.Velocity = Vector3.new(0, 0, 0)
+                rootPart.RotVelocity = Vector3.new(0, 0, 0)
+            end
+            
             for _, part in pairs(character:GetDescendants()) do
                 if part:IsA("BasePart") then
                     part.CanCollide = true
@@ -1229,10 +1241,5 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         end
     end
 end)
-
-
-
-
-
 
 updateESPForAllPlayers()
