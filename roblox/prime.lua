@@ -3,13 +3,20 @@ local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 
-
+local LocalPlayer = Players.LocalPlayer
 
 local TOGGLE_KEY = Enum.KeyCode.RightControl
 local player = Players.LocalPlayer
 local mouse = player:GetMouse()
 local originalWalkSpeed = 16
+local teamDetectionEnabled = false
 
+local function isTeammate(targetPlayer)
+    if teamDetectionEnabled and LocalPlayer.Team and targetPlayer.Team then
+        return LocalPlayer.Team == targetPlayer.Team
+    end
+    return false
+end
 
 local function getDistance(pointA, pointB)
     return (pointA - pointB).Magnitude
@@ -20,7 +27,7 @@ local function getClosestEnemyToCrosshair()
     local shortestDistance = math.huge
 
     for _, targetPlayer in ipairs(game.Players:GetPlayers()) do
-        if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Head") then
+        if targetPlayer ~= player and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Head") and not isTeammate(targetPlayer) then
             local head = targetPlayer.Character.Head
             local vector, onScreen = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
 
@@ -38,11 +45,14 @@ local function getClosestEnemyToCrosshair()
 end
 
 local function aimAt(targetPlayer)
-    if targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("Head") then
-        local head = targetPlayer.Character.Head
-        workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, head.Position)
+    if targetPlayer and targetPlayer.Character and not isTeammate(targetPlayer) then
+        local head = targetPlayer.Character:FindFirstChild("Head")
+        if head then
+            workspace.CurrentCamera.CFrame = CFrame.new(workspace.CurrentCamera.CFrame.Position, head.Position)
+        end
     end
 end
+
 
 
 local ScreenGui = Instance.new("ScreenGui")
@@ -236,34 +246,14 @@ yOffset = yOffset + 40 + spacing
 
 
 
-local espTypeDropdown = Instance.new("TextButton")
-espTypeDropdown.Size = UDim2.new(1, 0, 0, 30)
-espTypeDropdown.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-espTypeDropdown.Text = "ESP Type: Boxes"
-espTypeDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
-espTypeDropdown.Font = Enum.Font.Gotham
-espTypeDropdown.TextSize = 12
-espTypeDropdown.Parent = espContent
-
-local espTypeCorner = Instance.new("UICorner")
-espTypeCorner.CornerRadius = UDim.new(0, 6)
-espTypeCorner.Parent = espTypeDropdown
-
-
-local yOffset = 0
-local spacing = 10
-
-
-
-yOffset = yOffset + 40 + spacing  
-
-
 local espSection, espToggle, espIndicator, espContent, espClickDetector, espArrow = createSection("ESP", true)
 espSection.Position = UDim2.new(0, 0, 0, yOffset)
 espSection.Parent = ContentFrame
 
+
 local espTypeDropdown = Instance.new("TextButton")
 espTypeDropdown.Size = UDim2.new(1, 0, 0, 30)
+espTypeDropdown.Position = UDim2.new(0, 0, 0, 0)
 espTypeDropdown.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
 espTypeDropdown.Text = "ESP Type: Boxes"
 espTypeDropdown.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -275,7 +265,44 @@ local espTypeCorner = Instance.new("UICorner")
 espTypeCorner.CornerRadius = UDim.new(0, 6)
 espTypeCorner.Parent = espTypeDropdown
 
+
+local teammateDetectionButton = Instance.new("TextButton")
+teammateDetectionButton.Size = UDim2.new(1, 0, 0, 30)
+teammateDetectionButton.Position = UDim2.new(0, 0, 0, 35)  
+teammateDetectionButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+teammateDetectionButton.Text = "Teammate Detection: OFF"
+teammateDetectionButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+teammateDetectionButton.Font = Enum.Font.Gotham
+teammateDetectionButton.TextSize = 12
+teammateDetectionButton.Parent = espContent
+
+local teammateDetectionCorner = Instance.new("UICorner")
+teammateDetectionCorner.CornerRadius = UDim.new(0, 6)
+teammateDetectionCorner.Parent = teammateDetectionButton
+
+
+espContent.Size = UDim2.new(1, -20, 0, 65)  
+
+teammateDetectionButton.MouseButton1Click:Connect(function()
+    teamDetectionEnabled = not teamDetectionEnabled
+    teammateDetectionButton.Text = "Teammate Detection: " .. (teamDetectionEnabled and "ON" or "OFF")
+    
+    if espEnabled then
+        cleanupAllESP()
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= Players.LocalPlayer then
+                if espType == "boxes" then
+                    createBoxESP(p)
+                else
+                    createHighlightESP(p)
+                end
+            end
+        end
+    end
+end)
+
 yOffset = yOffset + 40 + spacing  
+
 
 
 local speedSection, speedToggle, speedIndicator, speedContent, speedClickDetector, speedArrow = createSection("Speed", true)
@@ -350,6 +377,9 @@ flightValue.TextColor3 = Color3.fromRGB(255, 255, 255)
 flightValue.Font = Enum.Font.Gotham
 flightValue.TextSize = 12
 flightValue.Parent = flightSlider
+
+
+
 
 local aiming = false
 local target = nil
@@ -429,14 +459,24 @@ local function toggleSection(section, content, arrow)
     )
     arrowTween:Play()
     
-    local goalSize = content.Visible and UDim2.new(1, 0, 0, 85) or UDim2.new(1, 0, 0, 40)
+    
+    local contentHeight = 0
+    if content.Visible then
+        for _, child in ipairs(content:GetChildren()) do
+            contentHeight = contentHeight + child.Size.Y.Offset + 5  
+        end
+        contentHeight = contentHeight + 10  
+    end
+    
+    local goalSize = content.Visible and UDim2.new(1, 0, 0, 40 + contentHeight) or UDim2.new(1, 0, 0, 40)
     local sizeTween = TweenService:Create(section,
         TweenInfo.new(0.2, Enum.EasingStyle.Quad),
         {Size = goalSize}
     )
     sizeTween:Play()
     
-    local currentY = section.Position.Y.Offset + (content.Visible and 85 or 40) + spacing
+    
+    local currentY = section.Position.Y.Offset + (content.Visible and (40 + contentHeight) or 40) + spacing
     local found = false
     
     for _, child in ipairs(ContentFrame:GetChildren()) do
@@ -464,13 +504,13 @@ local function createBoxESP(targetPlayer)
     if espObjects[targetPlayer] then
         return
     end
-    
+
     local highlightBox = Drawing.new("Square")
     highlightBox.Visible = false
     highlightBox.Thickness = 2
     highlightBox.Filled = false
     highlightBox.Color = Color3.fromRGB(255, 0, 0)
-    
+
     local playerName = Drawing.new("Text")
     playerName.Visible = false
     playerName.Size = 16
@@ -478,48 +518,44 @@ local function createBoxESP(targetPlayer)
     playerName.Center = true
     playerName.Outline = true
     playerName.OutlineColor = Color3.fromRGB(0, 0, 0)
-    
+
     espObjects[targetPlayer] = {
         box = highlightBox,
         name = playerName,
-        type = "box"
     }
-    
+
     local connection
     connection = RunService.Heartbeat:Connect(function()
-        if not targetPlayer or not targetPlayer.Parent or not espEnabled or espType ~= "boxes" then
+        if not targetPlayer or not targetPlayer.Parent then
             highlightBox.Visible = false
             playerName.Visible = false
-            if not targetPlayer or not targetPlayer.Parent then
-                cleanupESPForPlayer(targetPlayer)
-                connection:Disconnect()
-            end
+            espObjects[targetPlayer] = nil
+            connection:Disconnect()
             return
         end
-        
-        local character = targetPlayer.Character
-        local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
-        local head = character and character:FindFirstChild("Head")
-        
-        if humanoidRootPart and head then
-            local torsoPos = workspace.CurrentCamera:WorldToViewportPoint(humanoidRootPart.Position)
-            local headPos = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
-            
-            if torsoPos.Z > 0 then
-                local boxHeight = math.abs(headPos.Y - torsoPos.Y) * 2.5
-                local boxWidth = boxHeight * 0.7
-                
-                highlightBox.Size = Vector2.new(boxWidth, boxHeight)
-                highlightBox.Position = Vector2.new(torsoPos.X - boxWidth/2, torsoPos.Y - boxHeight/2)
-                highlightBox.Visible = true
-                
-                
-                local distance = (humanoidRootPart.Position - workspace.CurrentCamera.CFrame.Position).Magnitude
-                if distance >= 107 then
-                    playerName.Position = Vector2.new(torsoPos.X, torsoPos.Y - boxHeight/2 - 20)
+
+        if not isTeammate(targetPlayer) then
+            local character = targetPlayer.Character
+            local humanoidRootPart = character and character:FindFirstChild("HumanoidRootPart")
+            local head = character and character:FindFirstChild("Head")
+
+            if humanoidRootPart and head then
+                local torsoPos = workspace.CurrentCamera:WorldToViewportPoint(humanoidRootPart.Position)
+                local headPos = workspace.CurrentCamera:WorldToViewportPoint(head.Position)
+
+                if torsoPos.Z > 0 then
+                    local boxHeight = math.abs(headPos.Y - torsoPos.Y) * 2.5
+                    local boxWidth = boxHeight * 0.7
+
+                    highlightBox.Size = Vector2.new(boxWidth, boxHeight)
+                    highlightBox.Position = Vector2.new(torsoPos.X - boxWidth / 2, torsoPos.Y - boxHeight / 2)
+                    highlightBox.Visible = true
+
+                    playerName.Position = Vector2.new(torsoPos.X, torsoPos.Y - boxHeight / 2 - 20)
                     playerName.Text = targetPlayer.Name
                     playerName.Visible = true
                 else
+                    highlightBox.Visible = false
                     playerName.Visible = false
                 end
             else
@@ -532,6 +568,7 @@ local function createBoxESP(targetPlayer)
         end
     end)
 end
+
 
 local function createHighlightESP(targetPlayer)
     return
@@ -687,7 +724,6 @@ end)
 flightClickDetector.MouseButton1Click:Connect(function()
     toggleSection(flightSection, flightContent, flightArrow)
 end)
-
 speedToggle.MouseButton1Click:Connect(function()
     speedBoosted = not speedBoosted
     toggleButton(speedToggle, speedIndicator, speedBoosted)
