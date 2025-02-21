@@ -1178,6 +1178,7 @@ end)
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
     
+    
     if input.KeyCode == Enum.KeyCode.G then
         flying = not flying
         toggleButton(flightToggle, flightIndicator, flying)
