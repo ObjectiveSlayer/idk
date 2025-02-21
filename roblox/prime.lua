@@ -91,14 +91,14 @@ TopBarCorner.Parent = TopBar
 
 local Title = Instance.new("TextLabel")
 Title.Name = "Title"
-Title.Size = UDim2.new(1, -10, 1, 0)
-Title.Position = UDim2.new(0, 10, 0, 0)
+Title.Size = UDim2.new(1, 0, 1, 0)
+Title.Position = UDim2.new(0, 0, 0, 0)
 Title.BackgroundTransparency = 1
 Title.Text = "Diddy Central"
 Title.TextColor3 = Color3.fromRGB(255, 255, 255)
 Title.TextSize = 14
 Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Left
+Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.Parent = TopBar
 
 
@@ -171,7 +171,7 @@ local function createSection(name, hasCollapsible)
         
         local content = Instance.new("Frame")
         content.Name = "Content"
-        content.Size = UDim2.new(1, -20, 0, 35)
+        content.Size = UDim2.new(1, -20, 0, 100)
         content.Position = UDim2.new(0, 10, 0, 45)
         content.BackgroundTransparency = 1
         content.ClipsDescendants = true
@@ -378,7 +378,187 @@ flightValue.Font = Enum.Font.Gotham
 flightValue.TextSize = 12
 flightValue.Parent = flightSlider
 
+yOffset = yOffset + 40 + spacing
 
+
+local originalMenu = {
+    sections = {},
+    isInPlayersView = false
+}
+
+
+
+local playersSection = Instance.new("Frame")
+playersSection.Size = UDim2.new(1, 0, 0, 40)  
+playersSection.Position = UDim2.new(0, 0, 0, yOffset) 
+playersSection.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+playersSection.Parent = ContentFrame
+
+local playersCorner = Instance.new("UICorner")
+playersCorner.CornerRadius = UDim.new(0, 6)
+playersCorner.Parent = playersSection
+
+local playersButton = Instance.new("TextButton")
+playersButton.Size = UDim2.new(1, 0, 1, 0)
+playersButton.BackgroundTransparency = 1
+playersButton.Text = "Players"
+playersButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+playersButton.TextSize = 12
+playersButton.Font = Enum.Font.Gotham
+playersButton.TextXAlignment = Enum.TextXAlignment.Left
+playersButton.Parent = playersSection
+
+local playersPadding = Instance.new("UIPadding")
+playersPadding.PaddingLeft = UDim.new(0, 10)
+playersPadding.Parent = playersButton
+
+local playersArrow = Instance.new("ImageLabel")
+playersArrow.Size = UDim2.new(0, 20, 0, 20)
+playersArrow.Position = UDim2.new(1, -25, 0.5, -10)
+playersArrow.BackgroundTransparency = 1
+playersArrow.Image = "rbxassetid://6034818372"
+playersArrow.Rotation = 270  
+playersArrow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+playersArrow.Parent = playersSection
+
+
+
+local function showPlayersPage()
+    if originalMenu.isInPlayersView then return end
+    originalMenu.isInPlayersView = true
+    
+    
+    for _, child in ipairs(ContentFrame:GetChildren()) do
+        if child:IsA("Frame") or child:IsA("TextLabel") then
+            table.insert(originalMenu.sections, child)
+            child.Visible = false
+        end
+    end
+    
+    
+    local backArrow = Instance.new("ImageButton")
+    backArrow.Size = UDim2.new(0, 25, 0, 25)
+    backArrow.Position = UDim2.new(-0.03, 0, 0, -3)
+    backArrow.BackgroundTransparency = 1
+    backArrow.Image = "rbxassetid://6034818372"
+    backArrow.Rotation = 90  
+    backArrow.ImageColor3 = Color3.fromRGB(255, 255, 255)
+    backArrow.Parent = ContentFrame
+    
+    
+    backArrow.MouseEnter:Connect(function()
+        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), {
+            ImageColor3 = Color3.fromRGB(200, 200, 200)
+        }):Play()
+    end)
+    
+    backArrow.MouseLeave:Connect(function()
+        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), {
+            ImageColor3 = Color3.fromRGB(255, 255, 255)
+        }):Play()
+    end)
+    
+    
+    local buttonOffset = 30  
+    for _, p in ipairs(Players:GetPlayers()) do
+        if p ~= Players.LocalPlayer then
+            local buttonFrame = Instance.new("Frame")
+            buttonFrame.Name = "PlayerButton"
+            buttonFrame.Size = UDim2.new(1, -20, 0, 35)
+            buttonFrame.Position = UDim2.new(0, 10, 0, buttonOffset)
+            buttonFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+            buttonFrame.Parent = ContentFrame
+            
+            local buttonCorner = Instance.new("UICorner")
+            buttonCorner.CornerRadius = UDim.new(0, 6)
+            buttonCorner.Parent = buttonFrame
+
+            local button = Instance.new("TextButton")
+            button.Size = UDim2.new(1, 0, 1, 0)
+            button.Position = UDim2.new(0, 0, 0, 0)
+            button.BackgroundTransparency = 1
+            button.Text = p.Name
+            button.TextColor3 = Color3.fromRGB(255, 255, 255)
+            button.TextSize = 14
+            button.Font = Enum.Font.GothamBold
+            button.TextXAlignment = Enum.TextXAlignment.Left
+            button.Parent = buttonFrame
+            
+            local buttonPadding = Instance.new("UIPadding")
+            buttonPadding.PaddingLeft = UDim.new(0, 10)
+            buttonPadding.Parent = button
+            
+            button.MouseEnter:Connect(function()
+                game:GetService("TweenService"):Create(buttonFrame, TweenInfo.new(0.5), {
+                    BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+                }):Play()
+            end)
+            
+            button.MouseLeave:Connect(function()
+                game:GetService("TweenService"):Create(buttonFrame, TweenInfo.new(0.5), {
+                    BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+                }):Play()
+            end)
+
+            button.MouseButton1Click:Connect(function()
+                if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local targetCFrame = p.Character.HumanoidRootPart.CFrame
+                    local offset = targetCFrame.LookVector * -5
+                    local player = game.Players.LocalPlayer
+                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                        if noclipEnabled then
+                            noclipEnabled = false
+                            toggleButton(noclipToggle, noclipIndicator, false)
+                            if noclipConnection then
+                                noclipConnection:Disconnect()
+                                noclipConnection = nil
+                            end
+                        end
+                        player.Character.HumanoidRootPart.CFrame = CFrame.new(targetCFrame.Position + offset)
+                    end
+                end
+            end)
+
+            buttonOffset = buttonOffset + 40  
+        end
+    end
+    
+    
+    backArrow.MouseButton1Click:Connect(function()
+        
+        for _, child in ipairs(ContentFrame:GetChildren()) do
+            if (child:IsA("Frame") and child.Name == "PlayerButton") or child:IsA("ImageButton") then
+                child:Destroy()
+            end
+        end
+        
+        
+        for _, section in ipairs(originalMenu.sections) do
+            section.Visible = true
+        end
+        
+        
+        table.clear(originalMenu.sections)
+        originalMenu.isInPlayersView = false
+    end)
+end
+
+playersButton.MouseButton1Click:Connect(showPlayersPage)
+
+
+Players.PlayerAdded:Connect(function()
+    if originalMenu.isInPlayersView then
+        showPlayersPage()
+    end
+end)
+
+Players.PlayerRemoving:Connect(function()
+    if originalMenu.isInPlayersView then
+        showPlayersPage()
+    end
+end)
+
+yOffset = yOffset + 40 + spacing
 
 
 local aiming = false
@@ -724,6 +904,7 @@ end)
 flightClickDetector.MouseButton1Click:Connect(function()
     toggleSection(flightSection, flightContent, flightArrow)
 end)
+
 speedToggle.MouseButton1Click:Connect(function()
     speedBoosted = not speedBoosted
     toggleButton(speedToggle, speedIndicator, speedBoosted)
@@ -840,23 +1021,34 @@ local function cleanupScript()
         end
     end
     
-    if noclipEnabled then
-        toggleNoclip(false)
-    end
-    
     if flying then
         flying = false
         toggleButton(flightToggle, flightIndicator, false)
+        workspace.Gravity = 196.2
         local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
         if humanoid then
             humanoid.PlatformStand = false
         end
-        workspace.Gravity = 196.2
     end
     
-    if noclipConnection then
-        noclipConnection:Disconnect()
-        noclipConnection = nil
+    if noclipEnabled then
+        noclipEnabled = false
+        toggleButton(noclipToggle, noclipIndicator, false)
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+    
+    
+    if originalMenu.isInPlayersView then
+        showPlayersPage()
+    end
+    
+    for _, child in ipairs(playerListContainer:GetChildren()) do
+        if child:IsA("TextButton") then
+            child:Destroy()
+        end
     end
     
     if ScreenGui then
