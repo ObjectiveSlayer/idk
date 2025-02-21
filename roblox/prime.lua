@@ -822,13 +822,16 @@ local function toggleNoclip(enabled)
     toggleButton(noclipToggle, noclipIndicator, enabled)
     
     if enabled then
-        if noclipConnection then noclipConnection:Disconnect() end
-        noclipConnection = RunService.Stepped:Connect(onNoclipStep)
+        if noclipConnection then
+            noclipConnection:Disconnect()
+        end
+        noclipConnection = RunService.Heartbeat:Connect(onNoclipStep)
     else
         if noclipConnection then
             noclipConnection:Disconnect()
             noclipConnection = nil
         end
+        
         local character = player.Character
         if character then
             local humanoid = character:FindFirstChild("Humanoid")
@@ -843,11 +846,14 @@ local function toggleNoclip(enabled)
                 rootPart.RotVelocity = Vector3.new(0, 0, 0)
             end
             
-            for _, part in pairs(character:GetDescendants()) do
-                if part:IsA("BasePart") then
-                    part.CanCollide = true
+            task.spawn(function()
+                for _, part in pairs(character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = true
+                        part.AssemblyLinearVelocity = Vector3.new(0, 0, 0)
+                    end
                 end
-            end
+            end)
         end
     end
 end
@@ -1241,5 +1247,7 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
         end
     end
 end)
+
+
 
 updateESPForAllPlayers()
