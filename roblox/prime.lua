@@ -430,7 +430,6 @@ local function showPlayersPage()
     if originalMenu.isInPlayersView then return end
     originalMenu.isInPlayersView = true
     
-    
     originalMenu.sections = {}
     for _, child in ipairs(ContentFrame:GetChildren()) do
         if child:IsA("Frame") or child:IsA("TextLabel") then
@@ -438,7 +437,6 @@ local function showPlayersPage()
             child.Visible = false
         end
     end
-    
     
     local scrollFrame = Instance.new("ScrollingFrame")
     scrollFrame.Name = "PlayersScrollFrame"
@@ -451,11 +449,9 @@ local function showPlayersPage()
     scrollFrame.ScrollBarImageTransparency = 0.9
     scrollFrame.Parent = ContentFrame
     
-    
     local listLayout = Instance.new("UIListLayout")
     listLayout.Padding = UDim.new(0, 5)
     listLayout.Parent = scrollFrame
-    
     
     local backArrow = Instance.new("ImageButton")
     backArrow.Name = "BackArrow"
@@ -468,17 +464,13 @@ local function showPlayersPage()
     backArrow.Parent = ContentFrame
     
     backArrow.MouseEnter:Connect(function()
-        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), {
-            ImageColor3 = Color3.fromRGB(200, 200, 200)
-        }):Play()
+        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(200, 200, 200) }):Play()
     end)
     
     backArrow.MouseLeave:Connect(function()
-        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), {
-            ImageColor3 = Color3.fromRGB(255, 255, 255)
-        }):Play()
+        game:GetService("TweenService"):Create(backArrow, TweenInfo.new(0.2), { ImageColor3 = Color3.fromRGB(255, 255, 255) }):Play()
     end)
-    
+
     local function stopSpectating()
         if spectateConnection then
             spectateConnection:Disconnect()
@@ -487,177 +479,175 @@ local function showPlayersPage()
         currentlySpectating = nil
     end
     
-    
-    for _, p in ipairs(Players:GetPlayers()) do
-        if p ~= player then
-            local buttonFrame = Instance.new("Frame")
-            buttonFrame.Name = "PlayerButton"
-            buttonFrame.Size = UDim2.new(1, -10, 0, 50)
-            buttonFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
-            buttonFrame.Parent = scrollFrame
-            
-            local buttonCorner = Instance.new("UICorner")
-            buttonCorner.CornerRadius = UDim.new(0, 6)
-            buttonCorner.Parent = buttonFrame
-            
-            
-            local profilePicture = Instance.new("ImageLabel")
-            profilePicture.Size = UDim2.new(0, 40, 0, 40)
-            profilePicture.Position = UDim2.new(0, 5, 0.5, -20)
-            profilePicture.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-            profilePicture.Image = Players:GetUserThumbnailAsync(p.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
-            profilePicture.Parent = buttonFrame
-            
-            local profileCorner = Instance.new("UICorner")
-            profileCorner.CornerRadius = UDim.new(0, 20)
-            profileCorner.Parent = profilePicture
-            
-            
-            local nameLabel = Instance.new("TextLabel")
-            nameLabel.Size = UDim2.new(0.5, -50, 1, 0)
-            nameLabel.Position = UDim2.new(0, 55, 0, 0)
-            nameLabel.BackgroundTransparency = 1
-            nameLabel.Text = p.Name
-            nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-            nameLabel.TextSize = 14
-            nameLabel.Font = Enum.Font.GothamBold
-            nameLabel.TextXAlignment = Enum.TextXAlignment.Left
-            nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
-            nameLabel.Parent = buttonFrame
-            
-            
-            local buttonContainer = Instance.new("Frame")
-            buttonContainer.Size = UDim2.new(0, 70, 0, 30)
-            buttonContainer.Position = UDim2.new(1, -80, 0.5, -15)
-            buttonContainer.BackgroundTransparency = 1
-            buttonContainer.Parent = buttonFrame
-            
-            
-            local teleportButton = Instance.new("TextButton")
-            teleportButton.Size = UDim2.new(0, 30, 0, 30)
-            teleportButton.Position = UDim2.new(0, 0, 0, 0)
-            teleportButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            teleportButton.Text = "🚀"
-            teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            teleportButton.TextSize = 16
-            teleportButton.Font = Enum.Font.GothamBold
-            teleportButton.AutoButtonColor = false
-            teleportButton.Parent = buttonContainer
-            
-            local teleportCorner = Instance.new("UICorner")
-            teleportCorner.CornerRadius = UDim.new(0, 6)
-            teleportCorner.Parent = teleportButton
-            
-            
-            local spectateButton = Instance.new("TextButton")
-            spectateButton.Size = UDim2.new(0, 30, 0, 30)
-            spectateButton.Position = UDim2.new(1, -30, 0, 0)
-            spectateButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-            spectateButton.Text = "👁️"
-            spectateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-            spectateButton.TextSize = 16
-            spectateButton.Font = Enum.Font.GothamBold
-            spectateButton.AutoButtonColor = false
-            spectateButton.Parent = buttonContainer
-            
-            local spectateCorner = Instance.new("UICorner")
-            spectateCorner.CornerRadius = UDim.new(0, 6)
-            spectateCorner.Parent = spectateButton
-            
-            
-            local function addButtonEffects(button)
-                button.MouseEnter:Connect(function()
-                    game:GetService("TweenService"):Create(button, TweenInfo.new(0.3), {
-                        BackgroundColor3 = Color3.fromRGB(65, 65, 65)
-                    }):Play()
-                end)
-                
-                button.MouseLeave:Connect(function()
-                    game:GetService("TweenService"):Create(button, TweenInfo.new(0.3), {
-                        BackgroundColor3 = Color3.fromRGB(45, 45, 45)
-                    }):Play()
-                end)
-            end
-            
-            addButtonEffects(teleportButton)
-            spectateButton.MouseEnter:Connect(function()
-                if not isSpectating[p.Name] then
-                    TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
-                end
-            end)
-            
-            spectateButton.MouseLeave:Connect(function()
-                if not isSpectating[p.Name] then
-                    TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
-                end
-            end)
+    local players = Players:GetPlayers()
 
-            
-            spectateButton.MouseButton1Click:Connect(function()
-                if isSpectating[p.Name] then
-                    isSpectating[p.Name] = false
-                    TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
-                    workspace.CurrentCamera.CameraSubject = player.Character
-                else
-                    
-                    for pname, spectating in pairs(isSpectating) do
-                        if spectating then
-                            isSpectating[pname] = false
-                            
-                            for _, button in ipairs(scrollFrame:GetDescendants()) do
-                                if button:IsA("TextButton") and button.Text == "👁️" then
-                                    TweenService:Create(button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
-                                end
-                            end
-                        end
-                    end
-                    
-                    isSpectating[p.Name] = true
-                    TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 180, 45)}):Play()
-                    workspace.CurrentCamera.CameraSubject = p.Character
-                end
+    local function loadPlayerThumbnail(player, callback)
+        spawn(function()
+            local thumbnail = Players:GetUserThumbnailAsync(player.UserId, Enum.ThumbnailType.HeadShot, Enum.ThumbnailSize.Size48x48)
+            callback(thumbnail)
+        end)
+    end
+
+    local function addPlayerToUI(player)
+        local buttonFrame = Instance.new("Frame")
+        buttonFrame.Name = "PlayerButton"
+        buttonFrame.Size = UDim2.new(1, -10, 0, 50)
+        buttonFrame.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+        buttonFrame.Parent = scrollFrame
+        
+        local buttonCorner = Instance.new("UICorner")
+        buttonCorner.CornerRadius = UDim.new(0, 6)
+        buttonCorner.Parent = buttonFrame
+        
+        local profilePicture = Instance.new("ImageLabel")
+        profilePicture.Size = UDim2.new(0, 40, 0, 40)
+        profilePicture.Position = UDim2.new(0, 5, 0.5, -20)
+        profilePicture.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+        profilePicture.Image = ""
+        profilePicture.Parent = buttonFrame
+        
+        local profileCorner = Instance.new("UICorner")
+        profileCorner.CornerRadius = UDim.new(0, 20)
+        profileCorner.Parent = profilePicture
+        
+        local nameLabel = Instance.new("TextLabel")
+        nameLabel.Size = UDim2.new(0.5, -50, 1, 0)
+        nameLabel.Position = UDim2.new(0, 55, 0, 0)
+        nameLabel.BackgroundTransparency = 1
+        nameLabel.Text = player.Name
+        nameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+        nameLabel.TextSize = 14
+        nameLabel.Font = Enum.Font.GothamBold
+        nameLabel.TextXAlignment = Enum.TextXAlignment.Left
+        nameLabel.TextTruncate = Enum.TextTruncate.AtEnd
+        nameLabel.Parent = buttonFrame
+        
+        local buttonContainer = Instance.new("Frame")
+        buttonContainer.Size = UDim2.new(0, 70, 0, 30)
+        buttonContainer.Position = UDim2.new(1, -80, 0.5, -15)
+        buttonContainer.BackgroundTransparency = 1
+        buttonContainer.Parent = buttonFrame
+        
+        local teleportButton = Instance.new("TextButton")
+        teleportButton.Size = UDim2.new(0, 30, 0, 30)
+        teleportButton.Position = UDim2.new(0, 0, 0, 0)
+        teleportButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        teleportButton.Text = "🚀"
+        teleportButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        teleportButton.TextSize = 16
+        teleportButton.Font = Enum.Font.GothamBold
+        teleportButton.AutoButtonColor = false
+        teleportButton.Parent = buttonContainer
+        
+        local teleportCorner = Instance.new("UICorner")
+        teleportCorner.CornerRadius = UDim.new(0, 6)
+        teleportCorner.Parent = teleportButton
+        
+        local spectateButton = Instance.new("TextButton")
+        spectateButton.Size = UDim2.new(0, 30, 0, 30)
+        spectateButton.Position = UDim2.new(1, -30, 0, 0)
+        spectateButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+        spectateButton.Text = "👁️"
+        spectateButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+        spectateButton.TextSize = 16
+        spectateButton.Font = Enum.Font.GothamBold
+        spectateButton.AutoButtonColor = false
+        spectateButton.Parent = buttonContainer
+        
+        local spectateCorner = Instance.new("UICorner")
+        spectateCorner.CornerRadius = UDim.new(0, 6)
+        spectateCorner.Parent = spectateButton
+        
+        local function addButtonEffects(button)
+            button.MouseEnter:Connect(function()
+                game:GetService("TweenService"):Create(button, TweenInfo.new(0.3), {
+                    BackgroundColor3 = Color3.fromRGB(65, 65, 65)
+                }):Play()
             end)
-            
-            
-            teleportButton.MouseButton1Click:Connect(function()
-                if p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    local targetCFrame = p.Character.HumanoidRootPart.CFrame
-                    local offset = targetCFrame.LookVector * -5
-                    local player = game.Players.LocalPlayer
-                    if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                        if noclipEnabled then
-                            noclipEnabled = false
-                            toggleButton(noclipToggle, noclipIndicator, false)
-                            if noclipConnection then
-                                noclipConnection:Disconnect()
-                                noclipConnection = nil
-                            end
-                        end
-                        stopSpectating() 
-                        player.Character.HumanoidRootPart.CFrame = CFrame.new(targetCFrame.Position + offset)
-                    end
-                end
+            button.MouseLeave:Connect(function()
+                game:GetService("TweenService"):Create(button, TweenInfo.new(0.3), {
+                    BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+                }):Play()
             end)
         end
+
+        addButtonEffects(teleportButton)
+        spectateButton.MouseEnter:Connect(function()
+            if not isSpectating[p.Name] then
+                TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(60, 60, 60)}):Play()
+            end
+        end)
+        
+        spectateButton.MouseLeave:Connect(function()
+            if not isSpectating[p.Name] then
+                TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+            end
+        end)
+
+        spectateButton.MouseButton1Click:Connect(function()
+            if isSpectating[player.Name] then
+                isSpectating[player.Name] = false
+                TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+                workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character
+                spectateButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+            else
+                for pname, spectating in pairs(isSpectating) do
+                    if spectating then
+                        isSpectating[pname] = false
+                        
+                        for _, button in ipairs(scrollFrame:GetDescendants()) do
+                            if button:IsA("TextButton") and button.Text == "👁️" then
+                                TweenService:Create(button, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 45, 45)}):Play()
+                            end
+                        end
+                    end
+                end
+
+                stopSpectating()
+                isSpectating[player.Name] = true
+                TweenService:Create(spectateButton, TweenInfo.new(0.3), {BackgroundColor3 = Color3.fromRGB(45, 180, 45)}):Play()
+                workspace.CurrentCamera.CameraSubject = player.Character
+                
+                spectateButtonStates[player.Name] = spectateButton
+                currentlySpectating = player.Name
+            end
+        end)
+
+        teleportButton.MouseButton1Click:Connect(function()
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                local targetCFrame = player.Character.HumanoidRootPart.CFrame
+                local offset = targetCFrame.LookVector * -5
+                local localPlayer = game.Players.LocalPlayer
+                if localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(targetCFrame.Position + offset)
+                end
+            end
+        end)
+
+        loadPlayerThumbnail(player, function(thumbnail)
+            profilePicture.Image = thumbnail
+        end)
     end
     
-    
-    scrollFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y)
-    
+    spawn(function()
+        for _, p in ipairs(players) do
+            if p ~= player then
+                addPlayerToUI(p)
+                scrollFrame.CanvasSize = UDim2.new(0, 0, 0, listLayout.AbsoluteContentSize.Y)
+            end
+        end
+    end)
     
     backArrow.MouseButton1Click:Connect(function()
-        
         if game.Players.LocalPlayer.Character and game.Players.LocalPlayer.Character:FindFirstChild("Humanoid") then
             workspace.CurrentCamera.CameraSubject = game.Players.LocalPlayer.Character.Humanoid
         end
-        
         
         for _, child in ipairs(ContentFrame:GetChildren()) do
             if child.Name == "PlayersScrollFrame" or child.Name == "BackArrow" then
                 child:Destroy()
             end
         end
-        
         
         for _, section in ipairs(originalMenu.sections) do
             section.Visible = true
@@ -669,6 +659,7 @@ local function showPlayersPage()
 end
 
 playersButton.MouseButton1Click:Connect(showPlayersPage)
+
 
 
 Players.PlayerAdded:Connect(function()
