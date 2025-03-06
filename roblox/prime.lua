@@ -384,6 +384,98 @@ flightValue.Parent = flightSlider
 yOffset = yOffset + 40 + spacing
 
 
+local invisSection, invisToggle, invisIndicator = createSection("Invisibility")
+invisSection.Position = UDim2.new(0, 0, 0, yOffset)
+invisSection.Parent = ContentFrame
+yOffset = yOffset + invisSection.Size.Y.Offset + spacing
+
+local invisRunning = false
+local IsInvis = false
+local InvisibleCharacter = nil
+local invisFix = nil
+local invisDied = nil
+local Character = nil
+
+local function TurnVisible()
+    if not IsInvis then return end
+    if invisFix then invisFix:Disconnect() end
+    if invisDied then invisDied:Disconnect() end
+    
+    pcall(function()
+        local savedPos = nil
+        if InvisibleCharacter and InvisibleCharacter:FindFirstChild("HumanoidRootPart") then
+            savedPos = InvisibleCharacter.HumanoidRootPart.CFrame
+        end
+        
+        if InvisibleCharacter then
+            InvisibleCharacter:Destroy()
+            InvisibleCharacter = nil
+        end
+        
+        player.Character = Character
+        Character.Parent = workspace
+        IsInvis = false
+        invisRunning = false
+
+        local rootPart = Character:FindFirstChild("HumanoidRootPart")
+        if rootPart and savedPos then
+            rootPart.CFrame = savedPos
+        end
+        game:GetService("RunService").RenderStepped:Wait()
+        
+        workspace.CurrentCamera.CameraSubject = Character:FindFirstChildOfClass("Humanoid")
+    end)
+end
+
+local function toggleInvisibility(enabled)
+    if enabled then
+        if invisRunning then return end
+        invisRunning = true
+        
+        Character = player.Character
+        if not Character then return end
+        Character.Archivable = true
+        
+        InvisibleCharacter = Character:Clone()
+        InvisibleCharacter.Parent = workspace
+        InvisibleCharacter.Name = ""
+
+        for _, v in pairs(InvisibleCharacter:GetDescendants()) do
+            if v:IsA("BasePart") then
+                v.Transparency = v.Name == "HumanoidRootPart" and 1 or .5
+            end
+        end
+
+        invisDied = InvisibleCharacter:FindFirstChildOfClass('Humanoid').Died:Connect(function()
+            TurnVisible()
+        end)
+
+        if not IsInvis then
+            IsInvis = true
+            local CF_1 = Character.HumanoidRootPart.CFrame
+
+            Character:MoveTo(Vector3.new(0, math.pi * 1000000, 0))
+            workspace.CurrentCamera.CameraType = Enum.CameraType.Scriptable
+            task.wait(0.2)
+            workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+            Character.Parent = game:GetService("Lighting")
+
+            InvisibleCharacter.Parent = workspace
+            InvisibleCharacter.HumanoidRootPart.CFrame = CF_1
+            player.Character = InvisibleCharacter
+            workspace.CurrentCamera.CameraSubject = InvisibleCharacter.Humanoid
+
+            if InvisibleCharacter:FindFirstChild("Animate") then
+                InvisibleCharacter.Animate.Disabled = true
+                InvisibleCharacter.Animate.Disabled = false
+            end
+        end
+    else
+        TurnVisible()
+    end
+end
+
+
 local originalMenu = {
     sections = {},
     isInPlayersView = false
@@ -1008,6 +1100,12 @@ espToggle.MouseButton1Click:Connect(function()
             end
         end
     end
+end)
+
+invisToggle.MouseButton1Click:Connect(function()
+    local enabled = not IsInvis
+    toggleInvisibility(enabled)
+    toggleButton(invisToggle, invisIndicator, enabled)
 end)
 
 
