@@ -286,23 +286,7 @@ teammateDetectionCorner.Parent = teammateDetectionButton
 
 espContent.Size = UDim2.new(1, -20, 0, 65)  
 
-teammateDetectionButton.MouseButton1Click:Connect(function()
-    teamDetectionEnabled = not teamDetectionEnabled
-    teammateDetectionButton.Text = "Teammate Detection: " .. (teamDetectionEnabled and "ON" or "OFF")
-    
-    if espEnabled then
-        cleanupAllESP()
-        for _, p in ipairs(Players:GetPlayers()) do
-            if p ~= Players.LocalPlayer then
-                if espType == "boxes" then
-                    createBoxESP(p)
-                else
-                    createHighlightESP(p)
-                end
-            end
-        end
-    end
-end)
+
 
 yOffset = yOffset + 40 + spacing  
 
@@ -998,7 +982,23 @@ local function cleanupAllESP()
     espObjects = {}
 end
 
-
+teammateDetectionButton.MouseButton1Click:Connect(function()
+    teamDetectionEnabled = not teamDetectionEnabled
+    teammateDetectionButton.Text = "Teammate Detection: " .. (teamDetectionEnabled and "ON" or "OFF")
+    
+    if espEnabled then
+        cleanupAllESP()
+        for _, p in ipairs(Players:GetPlayers()) do
+            if p ~= Players.LocalPlayer then
+                if espType == "boxes" then
+                    createBoxESP(p)
+                else
+                    createHighlightESP(p)
+                end
+            end
+        end
+    end
+end)
 
 local function updateESPForAllPlayers()
     for _, targetPlayer in ipairs(Players:GetPlayers()) do
