@@ -13,6 +13,9 @@ local teamDetectionEnabled = false
 
 local currentlySpectating = nil
 local spectateConnection = nil
+local godmodeEnabled = false
+local humanoidStateBackup = {}
+local godmodeConnection = nil
 
 local function isTeammate(targetPlayer)
     if teamDetectionEnabled and LocalPlayer.Team and targetPlayer.Team then
@@ -76,7 +79,7 @@ MainFrame.Parent = ScreenGui
 
 
 local UICorner = Instance.new("UICorner")
-UICorner.CornerRadius = UDim.new(0, 8)
+UICorner.CornerRadius = UDim.new(0, 6)
 UICorner.Parent = MainFrame
 
 
@@ -107,25 +110,25 @@ Title.Parent = TopBar
 
 local ContentFrame = Instance.new("ScrollingFrame")
 ContentFrame.Name = "ContentFrame"
-ContentFrame.Size = UDim2.new(1, -20, 1, -40)
-ContentFrame.Position = UDim2.new(0, 10, 0, 35)
+ContentFrame.Size = UDim2.new(1, -10, 1, -40) 
+ContentFrame.Position = UDim2.new(0, 5, 0, 35)
 ContentFrame.BackgroundTransparency = 1
-ContentFrame.ScrollBarThickness = 4
-ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(75, 75, 75)
+ContentFrame.ScrollBarImageTransparency = 1 
+ContentFrame.ScrollBarThickness = 0        
+
+
 ContentFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 ContentFrame.Parent = MainFrame
-
-
 local function createSection(name, hasCollapsible)
     local section = Instance.new("Frame")
     section.Name = name .. "Section"
-    section.Size = UDim2.new(1, 0, 0, 40)
+    section.Size = UDim2.new(1, -7, 0, 40) 
     section.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     section.BorderSizePixel = 0
     
     local sectionCorner = Instance.new("UICorner")
-    sectionCorner.CornerRadius = UDim.new(0, 6)
+    sectionCorner.CornerRadius = UDim.new(0, 8)
     sectionCorner.Parent = section
     
     local title = Instance.new("TextLabel")
@@ -141,7 +144,7 @@ local function createSection(name, hasCollapsible)
     
     local toggle = Instance.new("TextButton")
     toggle.Size = UDim2.new(0, 50, 0, 24)
-    toggle.Position = UDim2.new(1, -60, 0, 8)
+    toggle.Position = UDim2.new(1, -65, 0, 8)
     toggle.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     toggle.Text = ""
     toggle.AutoButtonColor = false
@@ -203,7 +206,7 @@ local spacing = 10
 
 
 local aimbotSection, aimbotToggle, aimbotIndicator, aimbotContent, aimbotClickDetector, aimbotArrow = createSection("Aimbot", true)
-aimbotSection.Position = UDim2.new(0, 0, 0, yOffset)
+aimbotSection.Position = UDim2.new(0, 2, 0, yOffset)
 aimbotSection.Parent = ContentFrame
 
 local keybindButton = Instance.new("TextButton")
@@ -250,7 +253,7 @@ yOffset = yOffset + 40 + spacing
 
 
 local espSection, espToggle, espIndicator, espContent, espClickDetector, espArrow = createSection("ESP", true)
-espSection.Position = UDim2.new(0, 0, 0, yOffset)
+espSection.Position = UDim2.new(0, 2, 0, yOffset)
 espSection.Parent = ContentFrame
 
 
@@ -293,7 +296,7 @@ yOffset = yOffset + 40 + spacing
 
 
 local speedSection, speedToggle, speedIndicator, speedContent, speedClickDetector, speedArrow = createSection("Speed", true)
-speedSection.Position = UDim2.new(0, 0, 0, yOffset)
+speedSection.Position = UDim2.new(0, 2, 0, yOffset)
 speedSection.Parent = ContentFrame
 
 local speedSlider = Instance.new("Frame")
@@ -328,14 +331,21 @@ yOffset = yOffset + 40 + spacing
 
 
 local noclipSection, noclipToggle, noclipIndicator = createSection("Noclip", false)
-noclipSection.Position = UDim2.new(0, 0, 0, yOffset)
+noclipSection.Position = UDim2.new(0, 2, 0, yOffset)
 noclipSection.Parent = ContentFrame
 
 yOffset = yOffset + 40 + spacing
 
 
+local godmodeSection, godmodeToggle, godmodeIndicator = createSection("Godmode", false)
+godmodeSection.Position = UDim2.new(0, 2, 0, yOffset)
+godmodeSection.Parent = ContentFrame
+
+yOffset = yOffset + 40 + spacing
+
+
 local flightSection, flightToggle, flightIndicator, flightContent, flightClickDetector, flightArrow = createSection("Flight", true)
-flightSection.Position = UDim2.new(0, 0, 0, yOffset)
+flightSection.Position = UDim2.new(0, 2, 0, yOffset)
 flightSection.Parent = ContentFrame
 
 local flightSlider = Instance.new("Frame")
@@ -369,7 +379,7 @@ yOffset = yOffset + 40 + spacing
 
 
 local invisSection, invisToggle, invisIndicator = createSection("Invisibility")
-invisSection.Position = UDim2.new(0, 0, 0, yOffset)
+invisSection.Position = UDim2.new(0, 2, 0, yOffset)
 invisSection.Parent = ContentFrame
 yOffset = yOffset + invisSection.Size.Y.Offset + spacing
 
@@ -379,6 +389,8 @@ local InvisibleCharacter = nil
 local invisFix = nil
 local invisDied = nil
 local Character = nil
+
+
 
 local function TurnVisible()
     if not IsInvis then return end
@@ -468,8 +480,8 @@ local originalMenu = {
 local isSpectating = {}
 
 local playersSection = Instance.new("Frame")
-playersSection.Size = UDim2.new(1, 0, 0, 40)  
-playersSection.Position = UDim2.new(0, 0, 0, yOffset) 
+playersSection.Size = UDim2.new(1, -7, 0, 40)
+playersSection.Position = UDim2.new(0, 2, 0, yOffset) 
 playersSection.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 playersSection.Parent = ContentFrame
 
@@ -1073,6 +1085,57 @@ local function toggleNoclip(enabled)
     end
 end
 
+
+local function toggleGodmode(enabled)
+    godmodeEnabled = enabled
+    toggleButton(godmodeToggle, godmodeIndicator, enabled)
+
+    local character = player.Character
+    if not character then return end
+
+    local humanoid = character:FindFirstChildOfClass("Humanoid")
+    if not humanoid then return end
+
+    if enabled then
+        
+        humanoidStateBackup.MaxHealth = humanoid.MaxHealth
+        humanoidStateBackup.Health = humanoid.Health
+        humanoidStateBackup.BreakJointsOnDeath = humanoid.BreakJointsOnDeath
+        humanoidStateBackup.PlatformStand = humanoid.PlatformStand
+
+        
+        humanoid.MaxHealth = math.huge
+        humanoid.Health = math.huge
+        humanoid.BreakJointsOnDeath = false
+        humanoid.PlatformStand = false 
+
+        
+        if godmodeConnection then godmodeConnection:Disconnect() end
+        godmodeConnection = humanoid.HealthChanged:Connect(function()
+            if godmodeEnabled then
+                humanoid.Health = math.huge
+            end
+        end)
+
+    else
+        
+        humanoid.MaxHealth = humanoidStateBackup.MaxHealth or 100
+        humanoid.Health = humanoidStateBackup.Health or 100
+        humanoid.BreakJointsOnDeath = humanoidStateBackup.BreakJointsOnDeath or true
+        humanoid.PlatformStand = humanoidStateBackup.PlatformStand or false
+
+        
+        if godmodeConnection then
+            godmodeConnection:Disconnect()
+            godmodeConnection = nil
+        end
+    end
+end
+godmodeToggle.MouseButton1Click:Connect(function()
+    toggleGodmode(not godmodeEnabled)
+end)
+
+
 noclipToggle.MouseButton1Click:Connect(function()
     toggleNoclip(not noclipEnabled)
 end)
@@ -1339,7 +1402,21 @@ player.CharacterAdded:Connect(function(character)
         noclipConnection = RunService.Stepped:Connect(onNoclipStep)
     end
 end)
-
+player.CharacterAdded:Connect(function(character)
+    
+    repeat wait() until character:FindFirstChildOfClass("Humanoid")
+    
+    
+    if godmodeEnabled then
+        toggleGodmode(true)
+    end
+end)
+player.CharacterRemoving:Connect(function()
+    if godmodeEnabled then
+        repeat wait() until player.Character
+        toggleGodmode(true) 
+    end
+end)
 
 
 RunService.RenderStepped:Connect(function()
