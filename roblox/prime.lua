@@ -113,17 +113,19 @@ ContentFrame.Name = "ContentFrame"
 ContentFrame.Size = UDim2.new(1, -10, 1, -40) 
 ContentFrame.Position = UDim2.new(0, 5, 0, 35)
 ContentFrame.BackgroundTransparency = 1
-ContentFrame.ScrollBarImageTransparency = 1 
-ContentFrame.ScrollBarThickness = 0        
-
-
+ContentFrame.BorderSizePixel = 0
+ContentFrame.ScrollBarThickness = 3
+ContentFrame.ScrollBarImageColor3 = Color3.fromRGB(255, 255, 255)
+ContentFrame.ScrollBarImageTransparency = 0.9 
 ContentFrame.AutomaticCanvasSize = Enum.AutomaticSize.Y
 ContentFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
 ContentFrame.Parent = MainFrame
+
+
 local function createSection(name, hasCollapsible)
     local section = Instance.new("Frame")
     section.Name = name .. "Section"
-    section.Size = UDim2.new(1, -7, 0, 40) 
+    section.Size = UDim2.new(1, -10, 0, 40) 
     section.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
     section.BorderSizePixel = 0
     
@@ -204,7 +206,7 @@ local spacing = 10
 
 
 
-
+yOffset = 6
 local aimbotSection, aimbotToggle, aimbotIndicator, aimbotContent, aimbotClickDetector, aimbotArrow = createSection("Aimbot", true)
 aimbotSection.Position = UDim2.new(0, 2, 0, yOffset)
 aimbotSection.Parent = ContentFrame
@@ -337,11 +339,7 @@ noclipSection.Parent = ContentFrame
 yOffset = yOffset + 40 + spacing
 
 
-local godmodeSection, godmodeToggle, godmodeIndicator = createSection("Godmode", false)
-godmodeSection.Position = UDim2.new(0, 2, 0, yOffset)
-godmodeSection.Parent = ContentFrame
 
-yOffset = yOffset + 40 + spacing
 
 
 local flightSection, flightToggle, flightIndicator, flightContent, flightClickDetector, flightArrow = createSection("Flight", true)
@@ -479,8 +477,15 @@ local originalMenu = {
 
 local isSpectating = {}
 
+
+local godmodeSection, godmodeToggle, godmodeIndicator = createSection("Invincibility", false)
+godmodeSection.Position = UDim2.new(0, 2, 0, yOffset)
+godmodeSection.Parent = ContentFrame
+
+yOffset = yOffset + 40 + spacing
+
 local playersSection = Instance.new("Frame")
-playersSection.Size = UDim2.new(1, -7, 0, 40)
+playersSection.Size = UDim2.new(1, -10, 0, 37)
 playersSection.Position = UDim2.new(0, 2, 0, yOffset) 
 playersSection.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
 playersSection.Parent = ContentFrame
@@ -511,7 +516,6 @@ playersArrow.Image = "rbxassetid://6034818372"
 playersArrow.Rotation = 270  
 playersArrow.ImageColor3 = Color3.fromRGB(255, 255, 255)
 playersArrow.Parent = playersSection
-
 
 
 local function showPlayersPage()
@@ -746,6 +750,7 @@ local function showPlayersPage()
     end)
 end
 
+
 playersButton.MouseButton1Click:Connect(showPlayersPage)
 
 
@@ -762,7 +767,7 @@ Players.PlayerRemoving:Connect(function()
     end
 end)
 
-yOffset = yOffset + 40 + spacing
+
 
 
 local aiming = false
@@ -873,7 +878,7 @@ local function toggleSection(section, content, arrow)
         elseif found and child:IsA("Frame") then
             local positionTween = TweenService:Create(child,
                 TweenInfo.new(0.2, Enum.EasingStyle.Quad),
-                {Position = UDim2.new(0, 0, 0, currentY)}
+                {Position = UDim2.new(0, 2, 0, currentY)}
             )
             positionTween:Play()
             currentY = currentY + child.Size.Y.Offset + spacing
