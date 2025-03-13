@@ -856,7 +856,7 @@ local function toggleSection(section, content, arrow)
         contentHeight = contentHeight + 10  
     end
     
-    local goalSize = content.Visible and UDim2.new(1, 0, 0, 40 + contentHeight) or UDim2.new(1, 0, 0, 40)
+    local goalSize = content.Visible and UDim2.new(1, -7, 0, 40 + contentHeight) or UDim2.new(1, -7, 0, 40) 
     local sizeTween = TweenService:Create(section,
         TweenInfo.new(0.2, Enum.EasingStyle.Quad),
         {Size = goalSize}
